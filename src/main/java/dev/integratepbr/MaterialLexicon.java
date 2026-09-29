@@ -46,17 +46,24 @@ public final class MaterialLexicon {
             for (int index = 0; index < words.length; index++) {
                 String context = words[index];
                 if (!STONE_BASE.contains(context) && !STONE_FORM.contains(context)) continue;
-                String candidate = index == 0 && words.length > 1 ? words[1] : words[index - 1];
+                if (words.length < 2) continue;
+                String candidate = index == 0 ? words[1] : words[index - 1];
                 if (candidate.length() < 3 || NON_MATERIAL.contains(candidate)
                         || STONE_BASE.contains(candidate) || STONE_FORM.contains(candidate)) continue;
                 StoneEvidence found = stoneEvidence.computeIfAbsent(namespace, unused -> new HashMap<>())
                         .computeIfAbsent(candidate, unused -> new StoneEvidence());
                 if (STONE_BASE.contains(context)) found.base = true;
-                else found.form = true;
+                else {
+                    found.form = true;
+                    if (context.equals("brick") || context.equals("bricks")) found.masonryForms.add("brick");
+                    if (context.equals("tile") || context.equals("tiles")) found.masonryForms.add("tile");
+                    if (context.equals("polished")) found.masonryForms.add("polished");
+                }
             }
             for (int index = 0; index < words.length; index++) {
                 if (!CONTEXT.contains(words[index])) continue;
-                String candidate = index == 0 && words.length > 1 ? words[1] : words[index - 1];
+                if (words.length < 2) continue;
+                String candidate = index == 0 ? words[1] : words[index - 1];
                 if (candidate.length() < 3 || NON_MATERIAL.contains(candidate) || CONTEXT.contains(candidate)) continue;
                 Evidence found = evidence.computeIfAbsent(namespace, unused -> new HashMap<>())
                         .computeIfAbsent(candidate, unused -> new Evidence());
@@ -78,7 +85,9 @@ public final class MaterialLexicon {
         Map<String, Set<String>> stones = new HashMap<>();
         stoneEvidence.forEach((namespace, terms) -> {
             Set<String> accepted = new HashSet<>();
-            terms.forEach((term, found) -> { if (found.base && found.form) accepted.add(term); });
+            terms.forEach((term, found) -> {
+                if (found.base && found.form || found.masonryForms.size()>=2) accepted.add(term);
+            });
             stones.put(namespace, Set.copyOf(accepted));
         });
         return new MaterialLexicon(Map.copyOf(learned), Map.copyOf(frozenWoods), Map.copyOf(stones));
@@ -110,5 +119,6 @@ public final class MaterialLexicon {
 
     private static final class StoneEvidence {
         boolean base, form;
+        final Set<String> masonryForms = new HashSet<>();
     }
 }

@@ -44,7 +44,7 @@ public final class GeneratedPackManager {
     });
     private static final String PACK_NAME = "IntegratePBR_Generated";
     private static final String CACHE_NAME = ".integratepbr-cache.properties";
-    private static final String FORMAT_VERSION = "19";
+    private static final String FORMAT_VERSION = "21";
     private static volatile List<String> reviewEntries = List.of();
     private static final int MAX_SOURCE_BYTES = 16_000_000;
     private static final long MAX_PIXELS = 4_194_304L;
@@ -112,7 +112,9 @@ public final class GeneratedPackManager {
                 StandardCharsets.UTF_8);
         MaterialOverrides overrides = new MaterialOverrides(
                 FMLPaths.CONFIGDIR.get().resolve("integratepbr-overrides.properties"));
-        Map<ResourceLocation, Set<ModelTextureIndex.Owner>> textures = ModelTextureIndex.scan(resources);
+        ModelTextureIndex.ScanResult scan = ModelTextureIndex.scan(resources);
+        Map<ResourceLocation, Set<ModelTextureIndex.Owner>> textures = scan.textures();
+        Files.writeString(root.resolve("COVERAGE.txt"), scan.coverage(), StandardCharsets.UTF_8);
         List<String> registeredNames = java.util.stream.Stream.concat(
                         BuiltInRegistries.ITEM.keySet().stream(), BuiltInRegistries.BLOCK.keySet().stream())
                 .filter(id -> !id.getNamespace().equals("minecraft")

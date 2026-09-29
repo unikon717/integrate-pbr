@@ -23,11 +23,13 @@ public final class ModelTextureIndex {
     private final Map<ResourceLocation, JsonObject> jsonCache = new HashMap<>();
     private final Map<ResourceLocation, ModelData> modelCache = new HashMap<>();
     private final Map<ResourceLocation, Set<Owner>> ownersByTexture = new LinkedHashMap<>();
+    private final Set<Owner> scannedOwners = new LinkedHashSet<>();
+    public record ScanResult(Map<ResourceLocation, Set<Owner>> textures, String coverage) {}
 
     private record ModelData(Map<String, String> textures, Set<ResourceLocation> children) {}
     private ModelTextureIndex(ResourceManager resources) { this.resources = resources; }
 
-    public static Map<ResourceLocation, Set<Owner>> scan(ResourceManager resources) {
+    public static ScanResult scan(ResourceManager resources) {
         ModelTextureIndex index = new ModelTextureIndex(resources);
         for (ResourceLocation id : BuiltInRegistries.ITEM.keySet()) {
             if (index.isContentMod(id)) index.scanOwner(new Owner(MaterialOverrides.Kind.ITEM, id));
@@ -35,7 +37,19 @@ public final class ModelTextureIndex {
         for (ResourceLocation id : BuiltInRegistries.BLOCK.keySet()) {
             if (index.isContentMod(id)) index.scanOwner(new Owner(MaterialOverrides.Kind.BLOCK, id));
         }
-        return index.ownersByTexture;
+        Set<Owner> mapped = new HashSet<>();
+        index.ownersByTexture.values().forEach(mapped::addAll);
+        StringBuilder report = new StringBuilder("Model texture coverage (not a visual quality score)\n")
+                .append("Registered owners checked: ").append(index.scannedOwners.size())
+                .append("\nOwners with non-vanilla texture references: ").append(mapped.size())
+                .append("\nUnique referenced textures: ").append(index.ownersByTexture.size())
+                .append("\n\nOwners without discovered non-vanilla textures follow. They may reuse vanilla textures,\n")
+                .append("have no visible model, or use an unsupported custom/entity renderer.\n")
+                .append("A mapped owner can still have additional renderer textures that were not discovered.\n\n");
+        index.scannedOwners.stream().filter(owner -> !mapped.contains(owner))
+                .map(owner -> owner.kind() + " " + owner.id()).sorted()
+                .forEach(line -> report.append(line).append('\n'));
+        return new ScanResult(index.ownersByTexture, report.toString());
     }
 
     private boolean isContentMod(ResourceLocation id) {
@@ -44,6 +58,7 @@ public final class ModelTextureIndex {
     }
 
     private void scanOwner(Owner owner) {
+        scannedOwners.add(owner);
         ResourceLocation id = owner.id();
         if (owner.kind() == MaterialOverrides.Kind.ITEM) {
             ResourceLocation model = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "models/item/" + id.getPath() + ".json");

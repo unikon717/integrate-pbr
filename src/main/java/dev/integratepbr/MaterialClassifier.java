@@ -37,16 +37,17 @@ public final class MaterialClassifier {
         if (has(words, "glass", "ice", "crystal")) return sure(MaterialType.GLASS);
         if (has(words, "wood", "plank", "planks", "log", "stem", "bark")) return sure(MaterialType.WOOD);
         if (has(words, "leaf", "leaves")) return sure(MaterialType.LEAVES);
-        if (has(words, "grass", "moss", "flower", "vine", "sapling")) return sure(MaterialType.PLANT);
         if (has(words, "ore")) return uncertain(MaterialType.STONE, "ore may mix rock and mineral regions");
-        if (has(words, "stone", "rock", "deepslate", "cobble", "brick", "bricks", "tile", "tiles")) return sure(MaterialType.STONE);
+        if (has(words, "stone", "rock", "deepslate", "cobble", "cobbled", "cobblestone", "sandstone",
+                "brick", "bricks", "stonebrick", "stonebricks", "tile", "tiles")) return sure(MaterialType.STONE);
+        if (has(words, "grass", "moss", "flower", "vine", "sapling")) return sure(MaterialType.PLANT);
         if (has(words, "iron", "gold", "copper", "silver", "steel", "metal", "bronze", "aluminum", "aluminium")) return sure(MaterialType.METAL);
         boolean woodenProduct = has(words, "door", "trapdoor", "fence", "gate", "sign", "boat",
                 "chest", "button", "pressure", "stairs", "slab", "stick", "ladder", "beam", "panel", "table");
         if (learnedWoodTerm != null && woodenProduct)
             return uncertain(MaterialType.WOOD, "wood inferred from matching sapling: " + learnedWoodTerm);
         boolean masonryProduct = has(words, "stairs", "slab", "wall", "pillar", "tile", "tiles",
-                "polished", "chiseled", "carved", "block");
+                "polished", "chiseled", "carved", "engraved", "block");
         if (learnedStoneTerm != null && masonryProduct)
             return uncertain(MaterialType.STONE, "stone inferred from matching stone family: " + learnedStoneTerm);
         if (durableAttacker && learnedWoodTerm != null)

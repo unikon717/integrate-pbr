@@ -16,6 +16,9 @@ final class SurfaceEnhancer {
         double[][] mask=TextureStructure.depth(source,name,true);
         boolean found=false;
         for (double[] row:mask) for (double value:row) found |= value>0;
+        double[][] tonalProbe=new double[size][size];
+        SurfaceTone.apply(source,name,tonalProbe);
+        for (double[] row:tonalProbe) for (double value:row) found |= value>0;
         if (!found) return null;
         int scale=4, n=size*scale;
         var color=new BufferedImage(n,n,BufferedImage.TYPE_INT_ARGB);
@@ -37,7 +40,12 @@ final class SurfaceEnhancer {
         }
         double[][] depth=new double[n][n];
         for (int y=0;y<n;y++) for (int x=0;x<n;x++)
-            depth[y][x]=distance[y][x]>0 ? Math.min(1,(distance[y][x]-.5)/1.5) * mask[y/scale][x/scale] : 0;
+            // One half-height texel forms a narrow straight bevel inside the seam.
+            depth[y][x]=distance[y][x]>0 ? Math.min(1,distance[y][x]-.5) * mask[y/scale][x/scale] : 0;
+        // Palette stripes are flat, sharply bounded height regions. Only the seam
+        // mask above receives a bevel; feeding both through the same distance field
+        // rounded every tonal boundary and made engraved motifs look swollen.
+        SurfaceTone.apply(color,name,depth);
         return new Result(color,depth);
     }
 }

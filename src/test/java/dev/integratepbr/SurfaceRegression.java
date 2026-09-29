@@ -36,9 +36,43 @@ public final class SurfaceRegression {
             int d=maps.normal().getRGB(x,(y+1)%n)>>>24;
             int c=maps.normal().getRGB(x,y), nx=(c>>>16&255)-128, ny=(c>>>8&255)-128;
             check(nx*(l-r)>=0 && ny*(u-d)>=0,"Normal faces against height slope");
-            if(l!=r || u!=d) { slopes++; check(nx!=0 || ny!=0,"Missing bevel normal"); }
+            int height=c>>>24;
+            boolean slopeX=(l-height)*(height-r)>0;
+            boolean slopeY=(u-height)*(height-d)>0;
+            if(!slopeX) check(nx==0,"Bevel normal leaked onto an X plateau");
+            if(!slopeY) check(ny==0,"Bevel normal leaked onto a Y plateau");
+            if(slopeX || slopeY) { slopes++; check(nx!=0 || ny!=0,"Missing bevel normal"); }
         }
         check(slopes>0,"No relief exercised");
+        var layered=flat();
+        for(int x=0;x<16;x++) {
+            layered.setRGB(x,4,0xff302820);
+            layered.setRGB(x,10,0xffb3a088);
+        }
+        layered.setRGB(5,7,0xff302820);
+        var layers=SurfaceEnhancer.enhance(layered,"cedar_planks",true);
+        check(layers!=null,"Lost layered plank structure");
+        double deep=layers.depth()[4*4+2][8*4+2];
+        double shallowGrain=layers.depth()[10*4+2][8*4+2];
+        check(deep>.9 && shallowGrain>0 && shallowGrain<deep*.65,
+                "Pale grain has the same depth as a dark joint");
+        check(layers.depth()[7*4+2][5*4+2]==0,"Isolated dark speck gained height");
+        var layeredMaps=LabPbrMaps.generate(layers.albedo(),MaterialType.WOOD,"cedar_planks",true,layers.depth());
+        int deepHeight=layeredMaps.normal().getRGB(8*4+2,4*4+2)>>>24;
+        int shallowHeight=layeredMaps.normal().getRGB(8*4+2,10*4+2)>>>24;
+        check(deepHeight<shallowHeight && shallowHeight<255,"LabPBR height lost depth order");
+        for(String name:new String[]{"stripped_cedar_log","cedar_door_bottom","cedar_trapdoor"}) {
+            var shallow=LabPbrMaps.generate(a.albedo(),MaterialType.WOOD,name,true,a.depth());
+            int deepest=255,detailPixels=0;
+            for(int y=0;y<n;y++) for(int x=0;x<n;x++) {
+                int pixel=shallow.normal().getRGB(x,y);
+                deepest=Math.min(deepest,pixel>>>24);
+                if((pixel>>>16&255)!=128 || (pixel>>>8&255)!=128) detailPixels++;
+                check((pixel>>>24)>=231,"Shallow surface exceeds height budget");
+            }
+            check(deepest<255,"Shallow profile lost all height");
+            check(detailPixels==slopes,"Shallow profile lost existing normal detail");
+        }
         var ring=flat();
         for(int y=3;y<=12;y++) for(int x=3;x<=12;x++)
             if(x==3 || x==12 || y==3 || y==12) ring.setRGB(x,y,0xff302820);
@@ -73,7 +107,37 @@ public final class SurfaceRegression {
         var jointDepth=TextureStructure.depth(joints,"brick",true);
         for(int y=3;y<=7;y++) check(jointDepth[y][8]>0,"Real bounded joint removed");
         var transparent=flat(); transparent.setRGB(0,0,0);
-        check(SurfaceEnhancer.enhance(transparent,"planks",true)==null,"Enhanced transparent block");
+        check(SurfaceEnhancer.enhance(transparent,"planks",true)==null,"Transparency invented a groove");
+        var door=flat();
+        for(int x=2;x<14;x++) door.setRGB(x,10,0xff302820);
+        for(int y=2;y<6;y++) for(int x=2;x<6;x++) door.setRGB(x,y,0);
+        var doorResult=SurfaceEnhancer.enhance(door,"cedar_door_bottom",true);
+        check(doorResult!=null,"Cutout door lost opaque panel seam");
+        for(int y=0;y<64;y++) for(int x=0;x<64;x++) {
+            check(doorResult.albedo().getRGB(x,y)==door.getRGB(x/4,y/4),"Door transparency/artwork changed");
+            if(y/4!=10) check(doorResult.depth()[y][x]==0,"Door window invented relief");
+        }
+        var crack=flat();
+        for(int i=3;i<12;i++) crack.setRGB(i,i,0xff302820);
+        crack.setRGB(3,12,0xff302820);
+        var cracked=TextureStructure.depth(crack,"cracked_stone_bricks",true);
+        for(int i=3;i<12;i++) check(cracked[i][i]>0,"Diagonal crack discarded");
+        check(cracked[12][3]==0,"Crack profile accepted isolated noise");
+        check(SurfaceEnhancer.enhance(ring,"chiseled_chert",true)!=null,"Carving omitted by name gate");
+        var moss=flat(); moss.setRGB(4,4,0xff386628);
+        var vocabulary=MaterialLexicon.learn(java.util.List.of("example:stone","example:ore",
+                "example:chert_bricks","example:chert_tiles","example:cedar_sapling"));
+        check("chert".equals(vocabulary.matchingStoneTerm("example","chiseled_chert")),"Masonry family without stone suffix omitted");
+        check(MaterialClassifier.assess(flat(),"chiseled_chert",null,null,"chert",false).material()==MaterialType.STONE,"Carved family not classified as stone");
+        var covered=flat();
+        for(int x=1;x<14;x++) covered.setRGB(x,7,x==5 || x==9 ? 0xff386628 : 0xff302820);
+        var coveredDepth=TextureStructure.depth(covered,"mossy_bricks",true);
+        check(coveredDepth[7][5]==0 && coveredDepth[7][9]==0,"Moss gap was excavated");
+        check(coveredDepth[7][7]>0,"Observed groove behind moss lost all support");
+        check(MaterialClassifier.classify(moss,"moss_stone_bricks")==MaterialType.STONE,"Moss replaced masonry base");
+        var regions=MaterialRegions.classify(moss,MaterialType.STONE,"mossy_stone_bricks");
+        check(regions[4][4]==MaterialType.PLANT && regions[5][5]==MaterialType.STONE,"Moss not separated from stone");
+        check(TextureStructure.depth(moss,"mossy_stone_bricks",true)[4][4]==0,"Moss became a pit");
         check(MaterialClassifier.classify(flat(),"marble_bricks")==MaterialType.STONE,"Plural brick classification");
         // Animation frame neighbors must not bleed between stacked item frames.
         var animation=new BufferedImage(16,32,BufferedImage.TYPE_INT_ARGB);
