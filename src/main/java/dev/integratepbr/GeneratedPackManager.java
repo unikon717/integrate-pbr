@@ -44,7 +44,7 @@ public final class GeneratedPackManager {
     });
     private static final String PACK_NAME = "IntegratePBR_Generated";
     private static final String CACHE_NAME = ".integratepbr-cache.properties";
-    private static final String FORMAT_VERSION = "21";
+    private static final String FORMAT_VERSION = "22";
     private static volatile List<String> reviewEntries = List.of();
     private static final int MAX_SOURCE_BYTES = 16_000_000;
     private static final long MAX_PIXELS = 4_194_304L;
