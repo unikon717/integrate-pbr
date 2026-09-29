@@ -2,12 +2,93 @@
 
 这份文档说明怎样构建、测试和交付 Integrate PBR，以及哪些目录需要关心。项目面向 **Minecraft Java 版 1.21.1、NeoForge 和 JDK 21**。玩家功能与使用方式见 [README](README.md)，版本变化见 [CHANGELOG](CHANGELOG.md)。
 
-## 从源码开始
+## Quick Start
 
-1. 克隆仓库，并用 JDK 21 打开项目。IntelliJ IDEA 选择仓库根目录，等待 Gradle 导入完成。仓库自带 Gradle Wrapper，不需要另装 Gradle。
-2. 在仓库根目录运行构建：Windows 用 `gradlew.bat build`，Linux/macOS 用 `./gradlew build`。构建同时运行离线的表面生成回归检查。
-3. 成功后只取 `build/libs/integratepbr-<版本号>.jar`（目前是 `0.1.0`）。不要使用其他旧构建目录中同名的 JAR；需要确认时比较修改时间或 SHA-256。
-4. 修改生成算法后，先运行构建与回归检查，再用游戏内的固定场景比较原贴图、生成结果和参考效果。离线检查通过不代表视觉质量已达标。
+开始前只需要安装 **Git** 和 **JDK 21**。仓库已经包含 Gradle Wrapper，不需要单独安装 Gradle。以下命令会克隆源码、确认 Java 版本、编译模组并运行离线回归检查。
+
+Windows PowerShell：
+
+```powershell
+git clone https://github.com/unikon717/integrate-pbr.git
+Set-Location .\integrate-pbr
+java -version
+.\gradlew.bat build
+Get-ChildItem .\build\libs\*.jar
+```
+
+Linux 或 macOS：
+
+```bash
+git clone https://github.com/unikon717/integrate-pbr.git
+cd integrate-pbr
+java -version
+./gradlew build
+ls -lh build/libs/*.jar
+```
+
+`java -version` 应显示 Java 21。首次构建需要联网下载 Minecraft、NeoForge 和 Gradle 依赖，之后 Gradle 会复用本机缓存。看到 `BUILD SUCCESSFUL` 和 `Surface regression checks passed` 后，JAR 位于 `build/libs/integratepbr-<版本号>.jar`，目前版本号是 `0.1.0`。
+
+直接启动开发客户端：
+
+```powershell
+# Windows
+.\gradlew.bat runClient
+```
+
+```bash
+# Linux 或 macOS
+./gradlew runClient
+```
+
+开发客户端的数据目录是仓库内的 `run/`。第一次启动会创建游戏设置、日志、资源包和存档目录。要在现有测试实例中运行，则先完全关闭该实例，再复制新 JAR。Windows PowerShell 示例：
+
+```powershell
+$instance = 'D:\path\to\your-minecraft-instance'
+$mods = Join-Path $instance 'mods'
+$jar = Get-ChildItem .\build\libs\integratepbr-*.jar | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+New-Item -ItemType Directory -Force -Path $mods | Out-Null
+Copy-Item $jar.FullName $mods -Force
+Get-FileHash (Join-Path $mods $jar.Name) -Algorithm SHA256
+```
+
+Linux 或 macOS 示例：
+
+```bash
+instance="$HOME/path/to/your-minecraft-instance"
+mkdir -p "$instance/mods"
+jar=$(find build/libs -maxdepth 1 -name 'integratepbr-*.jar' -type f | sort | tail -n 1)
+cp -f "$jar" "$instance/mods/"
+# Linux：
+sha256sum "$instance/mods/$(basename "$jar")"
+# macOS 没有 sha256sum 时：
+shasum -a 256 "$instance/mods/$(basename "$jar")"
+```
+
+测试实例必须使用 **Minecraft 1.21.1 和 NeoForge 21.1.x**。若使用光影，还需要自行安装兼容该实例的 Iris、Sodium 和支持 labPBR 的光影；本项目不会自动下载或更新它们。进入游戏后，在资源包界面启用 **Integrate PBR - generated labPBR maps**。
+
+使用 IntelliJ IDEA 时，直接打开克隆后的仓库根目录，选择 JDK 21，等待 Gradle 同步完成。右侧 Gradle 面板中的 `Tasks → build → build` 等同于上述构建命令；运行配置中的 `runClient` 等同于开发客户端命令。
+
+日常修改后的最短验证流程是：
+
+```powershell
+# Windows
+.\gradlew.bat build
+```
+
+```bash
+# Linux 或 macOS
+./gradlew build
+```
+
+构建会自动执行 `surfaceRegression`，因此通常不需要再单独运行测试任务。修改生成算法后，还要在游戏内用固定场景比较原贴图、生成结果和参考效果；离线检查通过不代表视觉质量已经达标。
+
+### 常见启动问题
+
+- `java` 无法识别：安装 JDK 21，并把其 `bin` 目录加入 `PATH`，或把 `JAVA_HOME` 指向 JDK 21 的安装目录后重新打开终端。
+- `Unsupported class file` 或提示 Java 版本不符：再次运行 `java -version`，确认 Gradle 实际使用的是 Java 21。
+- Linux/macOS 提示 `Permission denied`：运行 `chmod +x gradlew`，然后再次执行 `./gradlew build`。
+- 修改后仍看到旧效果：确认测试实例中只有一个 Integrate PBR JAR；生成格式变化时还必须递增 `GeneratedPackManager.FORMAT_VERSION`，让旧缓存重新生成。
+- 只想重新开始构建：运行 `./gradlew clean build`；Windows 使用 `.\gradlew.bat clean build`。`clean` 只清理仓库的构建输出，不会清理 `run/` 中的世界或游戏设置。
 
 GitHub Actions 在推送和拉取请求时运行同样的 `./gradlew build`。目前它**只验证构建**，不会自动发布可下载的 JAR 或替换任何人的游戏实例。
 
