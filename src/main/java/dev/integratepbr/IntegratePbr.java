@@ -1,6 +1,5 @@
 package dev.integratepbr;
 
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.Mod;
 
@@ -8,7 +7,7 @@ import net.neoforged.fml.common.Mod;
 public final class IntegratePbr {
     public static final String MOD_ID = "integratepbr";
 
-    public IntegratePbr(IEventBus modEventBus) {
-        // Client-only setup lives in IntegratePbrClient.
+    public IntegratePbr() {
+        // Client events are registered by client.IntegratePbrClient.
     }
 }

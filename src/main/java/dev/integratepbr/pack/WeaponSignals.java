@@ -1,4 +1,6 @@
-package dev.integratepbr;
+package dev.integratepbr.pack;
+
+import dev.integratepbr.config.MaterialOverrides;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;

@@ -1,4 +1,4 @@
-package dev.integratepbr;
+package dev.integratepbr.texture;
 
 public enum MaterialType {
     GENERIC(100, 10, 0), FABRIC(106, 0, 30), LEATHER(110, 0, 0),

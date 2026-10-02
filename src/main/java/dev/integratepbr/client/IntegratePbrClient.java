@@ -1,4 +1,7 @@
-package dev.integratepbr;
+package dev.integratepbr.client;
+
+import dev.integratepbr.IntegratePbr;
+import dev.integratepbr.pack.GeneratedPackManager;
 
 import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;

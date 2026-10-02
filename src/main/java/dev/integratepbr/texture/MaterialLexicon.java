@@ -1,4 +1,4 @@
-package dev.integratepbr;
+package dev.integratepbr.texture;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -39,4 +39,4 @@ Integrate PBR 是面向 **Minecraft Java 版 1.21.1 / NeoForge** 的客户端模
 
 安装 **JDK 21**，在项目目录运行 `./gradlew build`（Windows 使用 `gradlew.bat build`）。构建好的 JAR 在 `build/libs/`。开发客户端可用 `./gradlew runClient` 启动。Gradle Wrapper 已包含在仓库中，无须单独安装 Gradle。
 
-参与开发或部署请看 [合作者指南](guidance.md)；主要改动见 [CHANGELOG.md](CHANGELOG.md)，早期实验记录保留在 [docs](docs)。
+参与开发、按模块定位代码或部署请看 [合作者指南](guidance.md)；主要改动见 [CHANGELOG.md](CHANGELOG.md)，早期实验记录保留在 [docs/history](docs/history)。

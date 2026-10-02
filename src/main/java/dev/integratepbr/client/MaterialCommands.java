@@ -1,4 +1,8 @@
-package dev.integratepbr;
+package dev.integratepbr.client;
+
+import dev.integratepbr.config.MaterialOverrides;
+import dev.integratepbr.pack.GeneratedPackManager;
+import dev.integratepbr.texture.MaterialType;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -15,10 +19,10 @@ import net.neoforged.fml.loading.FMLPaths;
 import java.io.IOException;
 
 /** Client-only commands for the held item or the block under the crosshair. */
-public final class MaterialCommands {
+final class MaterialCommands {
     private MaterialCommands() {}
 
-    public static void register(RegisterClientCommandsEvent event) {
+    static void register(RegisterClientCommandsEvent event) {
         var root = Commands.literal("integratepbr");
         root.then(target("held", MaterialOverrides.Kind.ITEM));
         root.then(target("block", MaterialOverrides.Kind.BLOCK));

@@ -1,4 +1,6 @@
-package dev.integratepbr;
+package dev.integratepbr.config;
+
+import dev.integratepbr.texture.MaterialType;
 
 import net.minecraft.resources.ResourceLocation;
 import java.io.IOException;
