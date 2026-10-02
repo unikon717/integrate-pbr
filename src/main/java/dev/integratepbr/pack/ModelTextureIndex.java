@@ -1,4 +1,7 @@
-package dev.integratepbr;
+package dev.integratepbr.pack;
+
+import dev.integratepbr.IntegratePbr;
+import dev.integratepbr.config.MaterialOverrides;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,19 +20,19 @@ import java.util.Map;
 import java.util.Set;
 
 /** Finds texture references in ordinary item models and blockstate/model JSON. */
-public final class ModelTextureIndex {
-    public record Owner(MaterialOverrides.Kind kind, ResourceLocation id) {}
+final class ModelTextureIndex {
+    record Owner(MaterialOverrides.Kind kind, ResourceLocation id) {}
     private final ResourceManager resources;
     private final Map<ResourceLocation, JsonObject> jsonCache = new HashMap<>();
     private final Map<ResourceLocation, ModelData> modelCache = new HashMap<>();
     private final Map<ResourceLocation, Set<Owner>> ownersByTexture = new LinkedHashMap<>();
     private final Set<Owner> scannedOwners = new LinkedHashSet<>();
-    public record ScanResult(Map<ResourceLocation, Set<Owner>> textures, String coverage) {}
+    record ScanResult(Map<ResourceLocation, Set<Owner>> textures, String coverage) {}
 
     private record ModelData(Map<String, String> textures, Set<ResourceLocation> children) {}
     private ModelTextureIndex(ResourceManager resources) { this.resources = resources; }
 
-    public static ScanResult scan(ResourceManager resources) {
+    static ScanResult scan(ResourceManager resources) {
         ModelTextureIndex index = new ModelTextureIndex(resources);
         for (ResourceLocation id : BuiltInRegistries.ITEM.keySet()) {
             if (index.isContentMod(id)) index.scanOwner(new Owner(MaterialOverrides.Kind.ITEM, id));

@@ -1,4 +1,4 @@
-package dev.integratepbr;
+package dev.integratepbr.texture;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;

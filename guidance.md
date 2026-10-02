@@ -68,19 +68,7 @@ shasum -a 256 "$instance/mods/$(basename "$jar")"
 
 使用 IntelliJ IDEA 时，直接打开克隆后的仓库根目录，选择 JDK 21，等待 Gradle 同步完成。右侧 Gradle 面板中的 `Tasks → build → build` 等同于上述构建命令；运行配置中的 `runClient` 等同于开发客户端命令。
 
-日常修改后的最短验证流程是：
-
-```powershell
-# Windows
-.\gradlew.bat build
-```
-
-```bash
-# Linux 或 macOS
-./gradlew build
-```
-
-构建会自动执行 `surfaceRegression`，因此通常不需要再单独运行测试任务。修改生成算法后，还要在游戏内用固定场景比较原贴图、生成结果和参考效果；离线检查通过不代表视觉质量已经达标。
+日常验证使用同一个 `build` 命令，它会通过 `check` 自动执行 `surfaceRegression`。测试使用 main 入口，不是 JUnit；只运行 `test` 不会执行这套回归。修改生成算法后，还要由使用者在游戏内用固定场景比较原贴图与生成结果；离线检查不代表视觉质量达标。
 
 ### 常见启动问题
 
@@ -96,21 +84,43 @@ GitHub Actions 在推送和拉取请求时运行同样的 `./gradlew build`。�
 
 | 路径 | 用途 | 是否提交到 Git |
 | --- | --- | --- |
-| `src/main/java/dev/integratepbr/` | 模组代码：资源发现、分类、PBR 生成、缓存和命令 | 是 |
+| `src/main/java/dev/integratepbr/IntegratePbr.java` | 模组加载入口 | 是 |
+| `src/main/java/dev/integratepbr/client/` | 客户端事件与玩家命令 | 是 |
+| `src/main/java/dev/integratepbr/config/` | 手动材质选择的读取、保存与回滚 | 是 |
+| `src/main/java/dev/integratepbr/texture/` | 材质分类、区域分析与贴图生成，不依赖 Minecraft | 是 |
+| `src/main/java/dev/integratepbr/pack/` | 游戏资源发现、生成编排、缓存和文件存储 | 是 |
 | `src/main/resources/`、`src/main/templates/` | 语言文件及 NeoForge 模组元数据模板 | 是 |
-| `src/test/` | 不启动游戏的生成回归检查 | 是 |
+| `src/test/java/dev/integratepbr/texture/` | 不启动游戏的生成回归检查，与算法保持同包 | 是 |
 | `gradle/wrapper/`、`gradlew*`、`build.gradle`、`gradle.properties`、`settings.gradle` | 构建配置和 Wrapper | 是 |
 | `.github/workflows/` | GitHub 自动构建 | 是 |
-| `docs/` | 较早实验的技术记录；玩家可读的变化以 `CHANGELOG.md` 为准 | 是 |
-| `build/`、`.gradle/` | 本机生成的输出与项目缓存，可重新生成 | 否 |
+| `docs/history/` | 历史实验记录，不作为当前开发指令 | 是 |
+| `build/`、`.gradle/`、`.gradle-user-home/` | 本机输出与缓存；最后一个仅用于选择项目内 Gradle 缓存时 | 否 |
 | `.idea/` | 本机 IntelliJ 设置 | 否 |
 | `run/` | `runClient` 使用的开发游戏目录，可能有世界、设置、模组和日志 | 否；**不要当作普通缓存删除** |
 
-`IntegratePbr` 是模组加载入口，`IntegratePbrClient` 注册客户端行为。`ModelTextureIndex` 找贴图；`MaterialLexicon`、`MaterialClassifier` 和 `MaterialRegions` 判断材质；`TextureStructure`、`SurfaceEnhancer`、`SurfaceTone`、`LabPbrMaps` 生成图；`GeneratedPackManager` 组织缓存和单一资源包；`MaterialCommands` 处理玩家覆盖选择。改动前先看相邻类的输入输出，不要把所有规则塞回一个总类。
+### 按任务定位代码
+
+| 想修改什么 | 先看哪个文件 |
+| --- | --- |
+| 事件注册、重载监听 | `client/IntegratePbrClient.java` |
+| held/block/review 命令 | `client/MaterialCommands.java` |
+| 手动选择的配置格式 | `config/MaterialOverrides.java` |
+| 模型引用、贴图覆盖范围 | `pack/ModelTextureIndex.java` |
+| 物品耐久度与攻击属性证据 | `pack/WeaponSignals.java` |
+| 缓存指纹、生成顺序、重载时机 | `pack/GeneratedPackManager.java` |
+| 输出路径、归属标记、PNG/mcmeta 与缓存写入 | `pack/GeneratedPackStore.java` |
+| 整体材质与家族学习 | `texture/MaterialClassifier.java`、`MaterialLexicon.java` |
+| 材质参数与局部分区 | `texture/MaterialType.java`、`MaterialRegions.java` |
+| 方块结构、浅层高度与原图放大 | `texture/TextureStructure.java`、`SurfaceTone.java`、`SurfaceEnhancer.java` |
+| 物品结构与 PBR 通道编码 | `texture/ItemStructure.java`、`LabPbrMaps.java` |
+
+依赖方向：`client → pack/config/texture`，`pack → config/texture`，`config → texture.MaterialType`。`texture` 不反向引用游戏或文件存储模块；其包级算法辅助类保持内部可见，测试同包访问。材质和表面算法保留在一个纯算法包内，避免为了分目录扩大辅助 API。
+
+资源重载或命令触发 `GeneratedPackManager`；它扫描引用、读取配置、检查缓存，然后调用分类与生成算法，最后经 `GeneratedPackStore` 保存。存储类负责文件操作，不决定材质、线程或重载。整理没有引入额外的 Gradle 子项目或规则框架。
 
 ## 本机调试与交付
 
-`gradlew.bat runClient`（Linux/macOS 用 `./gradlew runClient`）会启动开发客户端，默认数据目录是仓库内的 `run/`。正式测试实例应与它分开：把新构建的 JAR 复制到 **Minecraft 1.21.1 / NeoForge** 实例的 `mods/`，保留该实例现有的 Iris、Sodium、光影和世界。关闭游戏后再替换 JAR；不要把旧同名 JAR 一起放进 `mods/`。
+启动和部署命令见 Quick Start。正式测试实例与 `run/` 分开，保留已有光影与世界，并确保 `mods/` 中只有一个本项目 JAR。当前构建仅配置客户端开发运行；未使用的 server、gameTestServer、data 和本地 Maven 发布配置已移除。
 
 首次启动后，在游戏的资源包界面启用 **Integrate PBR - generated labPBR maps**。生成结果存放在该实例的 `resourcepacks/IntegratePBR_Generated`。算法或输出格式变化时，应递增 `GeneratedPackManager.FORMAT_VERSION`，让旧缓存失效。检查生成覆盖范围可看该资源包中的 `COVERAGE.txt`；它列的是未发现非原版贴图引用的对象，不能直接等同于生成失败清单。
 
