@@ -40,3 +40,13 @@ Integrate PBR 是面向 **Minecraft Java 版 1.21.1 / NeoForge** 的客户端模
 安装 **JDK 21**，在项目目录运行 `./gradlew build`（Windows 使用 `gradlew.bat build`）。构建好的 JAR 在 `build/libs/`。开发客户端可用 `./gradlew runClient` 启动。Gradle Wrapper 已包含在仓库中，无须单独安装 Gradle。
 
 参与开发、按模块定位代码或部署请看 [合作者指南](guidance.md)；主要改动见 [CHANGELOG.md](CHANGELOG.md)，早期实验记录保留在 [docs/history](docs/history)。
+
+## Model branch layout
+
+This branch preserves the inherited legacy generator at format22. Its packages are `client`, `config`, `pack`, and `texture`; the experimental model capture path is independent under `model/discovery` and `model/client`. Model capture does not run the legacy generator or approve generation.
+
+Use `/integratepbr-model held snapshot`, `/integratepbr-model block snapshot`, or the corresponding `runtime-snapshot` command to export development inputs to `integratepbr-dev/snapshots/<UUID>`. Runtime and atlas evidence remain incomplete observations; all proof and generation eligibility flags stay false.
+
+There is one Python package and CLI: `engine/src/integratepbr_engine`. `snapshot`, `runtime_observation`, `atlas_source`, and `usage` prepare evidence; `geometry` and `preprocess` prepare inputs; `network` and `pipeline` execute the model; `constraints` and `labpbr` compile outputs; `dataset`, `training`, `review`, `diagnostics`, and `model_package` support experiments and packages. Contracts and configuration live in `contracts` and `engine/configs`; no parallel engine is maintained.
+
+Build with JDK21 using `./gradlew build`. Offline Java checks are `surfaceRegression` and `resourceSnapshotRegression`; export fresh fixtures with `-PsnapshotFixture=<temporary path>`. Set `INTEGRATEPBR_SNAPSHOT_FIXTURE`, `INTEGRATEPBR_RUNTIME_FIXTURE` (path plus `-runtime`), and `INTEGRATEPBR_ATLAS_FIXTURE` (path plus `-atlas`), then run `python -m unittest discover -s engine/tests -p 'test_*.py'` with `PYTHONPATH=engine/src`. Fixtures verify mechanics and native source fidelity; they do not establish visual quality. Game launches and visual acceptance remain user controlled.

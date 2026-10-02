@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "materials": ["unknown", "wood", "stone", "metal", "glass", "gem", "soil", "sand", "ceramic", "fabric", "leather", "plant", "bone", "organic"],
+  "structures": ["unknown", "surface", "seam", "crack", "border", "inset_panel", "fitting", "bark_plate", "end_grain", "fine_grain", "decoration", "granular", "moss"],
+  "objects": ["unknown", "block", "item", "tool", "weapon", "armor", "door", "trapdoor", "log", "planks", "brick", "ore", "ingot", "container", "plant"],
+  "metals": ["none", "iron", "gold", "aluminum", "chrome", "copper", "lead", "platinum", "silver", "generic"],
+  "metal_labpbr_green": {"none": null, "iron": 230, "gold": 231, "aluminum": 232, "chrome": 233, "copper": 234, "lead": 235, "platinum": 236, "silver": 237, "generic": 255}
+}
+

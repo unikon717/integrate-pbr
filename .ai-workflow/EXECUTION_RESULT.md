@@ -1,0 +1,14 @@
+# Model isolation execution result
+Status: PASS — awaiting Tech Lead final review
+Executor: GPT-6.1 Sol / low, 2026-10-03
+Result: isolation-complete-78c2b1
+
+Independent model.discovery four classes/model.client ModelCommands and three discovery regressions implemented. Snapshot-only index has no legacy imports; Kind/Owner belongs to ResourceSnapshot; runtime/atlas wrappers share one private Bundle. Separate /integratepbr-model held|block snapshot|runtime-snapshot commands. Canonical legacy format22/source bytes retained; single engine/contracts/configs unchanged. Exact27 obsolete files deleted only after archived hash/byte match. Root receipts39 restoration9662e6,7 relocation5110ea,32generatedfiles/13emptydirs cleanupb93754.
+
+Docs accurately map four legacy packages and existing Python modules; guidance links README commands/checks. AGENTS retains baseline/max-high-low/failure handoff and canonical Code boundaries plus model independence and one concise redundancy/history rule. README/guidance/AGENTS UTF8 byte LF normalization preserved text; git diff --check and git status PASS78c2b1. Status: only six intended tracked root edits and workflow/agent/contracts/docs/engine/model additions. Root owns ref/publication verification.
+
+Retained PASS: Java21 cached offline compileJava testClasses surfaceRegression resourceSnapshotRegression build (fresh -PsnapshotFixture); atlas supplier-zero/real manager fixtures. Python focused9atlas/10runtime/14snapshot(skip1); full83(skip2), compileall/all-module imports with temp bytecode. Existing Windows skips retained. No unchanged tests/verifier rerun after docs-only patches.
+
+Artifact verifier C:/Users/94787/AppData/Local/Temp/integratepbr-isolation-verify.py PASS9de388:33 immutable canonical files;79 maintained engine/contracts/agents unchanged; contracts structural equality (not full instance validation);22production/4test inventory, private wrapper/no legacy imports, Unicode fixture SHA25622fee13c863e908d2a515fea06a9ec2ff66db56c119fb3aa93a2a2ce26fca65c. Source IDd66027629c109be1ccb690c912f6cd55fa1cbae76ed72d8678d6bd06cd642260;17runtime/47atlas fixtures, proof/eligibility false. Fixture C:/Users/94787/AppData/Local/Temp/integratepbr-model-isolation-a4a14c213f924db099756d366d52a827. JAR D:/MinecraftMods/integrate-pbr/build/libs/integratepbr-0.1.0.jar175549bytes SHA256bbb5d71cfb37489370792bc0145a4fa6c04d366bd7ad21152e88bbc1bb021298;expected classes/no flatduplicates/tests.
+
+Direct original model deltas: package moves/Owner-Kind refs; snapshot-only index removes legacy scan branch; one-Bundle public wrappers; commands extracted; fixture Unicode restored via ASCII escapes. Failures/recovery superseded by current successful evidence; preserved archive remains immutable. CPU/random fixtures establish mechanics only; no visual quality/generation eligibility claims, game/training/dependency/network/ref/index/commit/publication actions.

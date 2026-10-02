@@ -1,0 +1,1039 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "origin": {
+      "enum": [
+        "client_runtime_query",
+        "test_fixture"
+      ]
+    },
+    "adapter": {
+      "const": "selected_baked_query_v1"
+    },
+    "selected_owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "item",
+            "block"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ]
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "unsupported"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selected_query_usage": {
+          "enum": [
+            "item",
+            "block"
+          ]
+        },
+        "dimension_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+        },
+        "game_time": {
+          "type": "integer"
+        },
+        "rendered_frame_verified": {
+          "const": false
+        },
+        "visible_faces_evaluated": {
+          "const": false
+        },
+        "item": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "stack_count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "stack_encoding": {
+                  "anyOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "stack_encoding_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "context_identity_complete": {
+                  "type": "boolean"
+                },
+                "entity_id": {
+                  "type": "integer"
+                },
+                "display_context": {
+                  "enum": [
+                    "FIRST_PERSON_LEFT_HAND",
+                    "FIRST_PERSON_RIGHT_HAND"
+                  ]
+                },
+                "left_hand": {
+                  "type": "boolean"
+                },
+                "model_seed": {
+                  "type": "integer"
+                },
+                "quad_seed": {
+                  "type": "integer",
+                  "const": 42
+                },
+                "base_model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "resolved_model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "transformed_model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pose_matrix": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 16,
+                      "maxItems": 16
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pose_scope": {
+                  "const": "camera_transform_then_item_center"
+                },
+                "stack_encoding_json": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 65536
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "stack_count",
+                "stack_encoding",
+                "stack_encoding_sha256",
+                "context_identity_complete",
+                "entity_id",
+                "display_context",
+                "left_hand",
+                "model_seed",
+                "quad_seed",
+                "base_model_handle",
+                "resolved_model_handle",
+                "transformed_model_handle",
+                "pose_matrix",
+                "pose_scope",
+                "stack_encoding_json"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "block": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "position": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "state_properties": {
+                  "type": "object",
+                  "maxProperties": 64,
+                  "additionalProperties": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "propertyNames": {
+                    "maxLength": 256
+                  }
+                },
+                "render_shape": {
+                  "enum": [
+                    "MODEL",
+                    "INVISIBLE",
+                    "ENTITYBLOCK_ANIMATED"
+                  ]
+                },
+                "state_seed": {
+                  "type": "integer"
+                },
+                "model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "model_data_origin": {
+                  "const": "client_level_model_data_manager"
+                },
+                "input_model_data_empty": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "derived_model_data_empty": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "chunk_mesh_reproduction": {
+                  "const": false
+                },
+                "block_entity_renderer_included": {
+                  "const": false
+                }
+              },
+              "required": [
+                "position",
+                "state_properties",
+                "render_shape",
+                "state_seed",
+                "model_handle",
+                "model_data_origin",
+                "input_model_data_empty",
+                "derived_model_data_empty",
+                "chunk_mesh_reproduction",
+                "block_entity_renderer_included"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "selected_query_usage",
+        "dimension_id",
+        "game_time",
+        "rendered_frame_verified",
+        "visible_faces_evaluated",
+        "item",
+        "block"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "selected_query_usage": {
+              "const": "item"
+            },
+            "item": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "stack_count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "stack_encoding": {
+                  "anyOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "stack_encoding_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "context_identity_complete": {
+                  "type": "boolean"
+                },
+                "entity_id": {
+                  "type": "integer"
+                },
+                "display_context": {
+                  "enum": [
+                    "FIRST_PERSON_LEFT_HAND",
+                    "FIRST_PERSON_RIGHT_HAND"
+                  ]
+                },
+                "left_hand": {
+                  "type": "boolean"
+                },
+                "model_seed": {
+                  "type": "integer"
+                },
+                "quad_seed": {
+                  "type": "integer",
+                  "const": 42
+                },
+                "base_model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "resolved_model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "transformed_model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pose_matrix": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 16,
+                      "maxItems": 16
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pose_scope": {
+                  "const": "camera_transform_then_item_center"
+                },
+                "stack_encoding_json": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 65536
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "stack_count",
+                "stack_encoding",
+                "stack_encoding_sha256",
+                "context_identity_complete",
+                "entity_id",
+                "display_context",
+                "left_hand",
+                "model_seed",
+                "quad_seed",
+                "base_model_handle",
+                "resolved_model_handle",
+                "transformed_model_handle",
+                "pose_matrix",
+                "pose_scope",
+                "stack_encoding_json"
+              ]
+            },
+            "block": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "properties": {
+            "selected_query_usage": {
+              "const": "block"
+            },
+            "block": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "position": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "state_properties": {
+                  "type": "object",
+                  "maxProperties": 64,
+                  "additionalProperties": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "propertyNames": {
+                    "maxLength": 256
+                  }
+                },
+                "render_shape": {
+                  "enum": [
+                    "MODEL",
+                    "INVISIBLE",
+                    "ENTITYBLOCK_ANIMATED"
+                  ]
+                },
+                "state_seed": {
+                  "type": "integer"
+                },
+                "model_handle": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "model_data_origin": {
+                  "const": "client_level_model_data_manager"
+                },
+                "input_model_data_empty": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "derived_model_data_empty": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "chunk_mesh_reproduction": {
+                  "const": false
+                },
+                "block_entity_renderer_included": {
+                  "const": false
+                }
+              },
+              "required": [
+                "position",
+                "state_properties",
+                "render_shape",
+                "state_seed",
+                "model_handle",
+                "model_data_origin",
+                "input_model_data_empty",
+                "derived_model_data_empty",
+                "chunk_mesh_reproduction",
+                "block_entity_renderer_included"
+              ]
+            },
+            "item": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handle": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "class_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "resource_id": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "handle",
+          "class_name",
+          "resource_id"
+        ]
+      },
+      "maxItems": 32
+    },
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "model_handle": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pass_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 7
+          },
+          "render_type_index": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15
+          },
+          "render_type_class": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "render_type_diagnostic": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bucket": {
+            "enum": [
+              "down",
+              "up",
+              "north",
+              "south",
+              "west",
+              "east",
+              null
+            ]
+          },
+          "seed": {
+            "type": "integer"
+          },
+          "quad_indices": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxItems": 128
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "incomplete",
+              "unsupported"
+            ]
+          },
+          "omission_codes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "maxItems": 256
+          }
+        },
+        "required": [
+          "query_id",
+          "model_handle",
+          "pass_index",
+          "render_type_index",
+          "render_type_class",
+          "render_type_diagnostic",
+          "bucket",
+          "seed",
+          "quad_indices",
+          "status",
+          "omission_codes"
+        ]
+      },
+      "maxItems": 896
+    },
+    "sprites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sprite_handle": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sprite_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+          },
+          "atlas_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "u0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "u1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "v0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "v1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mapping_status": {
+            "const": "unknown"
+          }
+        },
+        "required": [
+          "sprite_handle",
+          "sprite_id",
+          "atlas_id",
+          "width",
+          "height",
+          "u0",
+          "u1",
+          "v0",
+          "v1",
+          "mapping_status"
+        ]
+      },
+      "maxItems": 256
+    },
+    "quads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "quad_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sprite_handle": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "facing": {
+            "enum": [
+              "down",
+              "up",
+              "north",
+              "south",
+              "west",
+              "east"
+            ]
+          },
+          "shade": {
+            "type": "boolean"
+          },
+          "ambient_occlusion": {
+            "type": "boolean"
+          },
+          "tint": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "status": {
+                "enum": [
+                  "untinted",
+                  "sampled",
+                  "incomplete"
+                ]
+              },
+              "raw_color": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "encoding": {
+                "enum": [
+                  "item_argb32",
+                  "block_color_int"
+                ]
+              },
+              "error_code": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "raw_color",
+              "encoding",
+              "error_code"
+            ]
+          },
+          "packed_vertices": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "maxItems": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "packed_vertex_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "decoded_vertices": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "position": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "atlas_uv": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "vertex_color": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "position",
+                    "atlas_uv",
+                    "vertex_color"
+                  ]
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "local_sprite_uv": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "minItems": 4,
+                "maxItems": 4
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "incomplete",
+              "unsupported"
+            ]
+          },
+          "omission_codes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "maxItems": 256
+          },
+          "tint_index": {
+            "type": "integer",
+            "minimum": -2147483648,
+            "maximum": 2147483647
+          }
+        },
+        "required": [
+          "quad_id",
+          "query_id",
+          "sprite_handle",
+          "facing",
+          "shade",
+          "ambient_occlusion",
+          "tint",
+          "packed_vertices",
+          "packed_vertex_count",
+          "decoded_vertices",
+          "local_sprite_uv",
+          "status",
+          "omission_codes",
+          "tint_index"
+        ]
+      },
+      "maxItems": 2048
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "maxItems": 256
+    },
+    "omissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "required": [
+          "code",
+          "detail"
+        ]
+      },
+      "maxItems": 256
+    }
+  },
+  "required": [
+    "schema_version",
+    "origin",
+    "adapter",
+    "selected_owner",
+    "status",
+    "context",
+    "models",
+    "queries",
+    "sprites",
+    "quads",
+    "limitations",
+    "omissions"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://integratepbr.dev/contracts/runtime-observation.v1.schema.json"
+}

@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://integratepbr.dev/contracts/generation-result.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocol_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "job_id": {
+      "$ref": "#/$defs/text"
+    },
+    "resource_snapshot_id": {
+      "$ref": "#/$defs/text"
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "preprocessing",
+        "understanding",
+        "segmenting",
+        "generating",
+        "checking",
+        "encoding",
+        "completed",
+        "partial",
+        "skipped",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "engine_version": {
+      "$ref": "#/$defs/text"
+    },
+    "model_version": {
+      "$ref": "#/$defs/text"
+    },
+    "preprocessing_version": {
+      "$ref": "#/$defs/text"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "fallback": {
+      "$ref": "#/$defs/fallback"
+    },
+    "timing": {
+      "$ref": "#/$defs/timing"
+    },
+    "error": {
+      "$ref": "#/$defs/error"
+    }
+  },
+  "required": [
+    "protocol_version",
+    "job_id",
+    "resource_snapshot_id",
+    "status",
+    "engine_version",
+    "model_version",
+    "preprocessing_version",
+    "files",
+    "checks",
+    "fallback",
+    "timing"
+  ],
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[^/]+(?:/[^/]+)*$"
+    },
+    "resource_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relative_path"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "role": {
+          "$ref": "#/$defs/text"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "passed"
+      ]
+    },
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "used": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "used",
+        "reason"
+      ]
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "total_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "stages_ms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "required": [
+        "total_ms",
+        "stages_ms"
+      ]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/text"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ]
+    }
+  },
+  "if": {
+    "properties": {
+      "status": {
+        "const": "failed"
+      }
+    },
+    "required": [
+      "status"
+    ]
+  },
+  "then": {
+    "required": [
+      "error"
+    ]
+  }
+}

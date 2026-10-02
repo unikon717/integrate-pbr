@@ -39,3 +39,14 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Model development generated files ###
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+logs/
+data/
+weights/
+models/

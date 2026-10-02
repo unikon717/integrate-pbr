@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "profiles": {
+    "item_surface": {"guidance": "Preserve original RGBA and artwork. Use broad material roughness and reflection; use restrained or flat relief unless structure evidence exists. Do not invent geometry or assume every item is wood."},
+    "block_surface": {"guidance": "Preserve original artwork and alpha. Evidence-supported structural and material regions are permitted within existing height bounds. Do not invent geometry."}
+  },
+  "statuses_without_profile": ["unresolved", "conflict"],
+  "rules": {"verified_item": "SURFACE_VERIFIED_ITEM_V1", "verified_block": "SURFACE_VERIFIED_BLOCK_V1", "conflict": "SURFACE_CONFLICT_V1", "unresolved": "SURFACE_UNRESOLVED_V1"},
+  "annotations": [
+    {"sample_id": "ref-798f833c142424e5-ad420d8c73", "reference_entry": "assets/minecraft/textures/item/birch_door.png", "source": "user_confirmed", "reviewed_training_label": false, "role": "held item icon", "render_surface": "item_surface", "region_geometry": "unknown", "guidance": "Broad wood roughness and restrained or flat relief for the icon; preserve original artwork."},
+    {"sample_id": "ref-868e4a00cceb8e26-442802c1a6", "reference_entry": "assets/minecraft/textures/block/birch_door_top.png", "source": "user_confirmed", "reviewed_training_label": false, "role": "placed upper half", "render_surface": "block_surface", "region_geometry": "unknown", "guidance": "Large pale upper interior panel is wood; left and right dark-gray patches are metal fittings. Qualitative observations only."},
+    {"sample_id": "ref-932705109984973e-35a7bfcc94", "reference_entry": "assets/minecraft/textures/block/birch_door_bottom.png", "source": "user_confirmed", "reviewed_training_label": false, "role": "placed lower half", "render_surface": "block_surface", "region_geometry": "unknown", "guidance": "Placed door half is a detailed PBR visual-review priority. Wood panel and left/right dark-gray metal-fitting observations are qualitative for the assembled door."}
+  ]
+}

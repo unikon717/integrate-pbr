@@ -138,3 +138,7 @@ GitHub Actions 在推送和拉取请求时运行同样的 `./gradlew build`。�
 - 为能脱离游戏验证的规则补充 `SurfaceRegression` 检查，再在游戏中看实际光影效果。最终质量由使用者判断；不要自行关闭正在运行的游戏。
 
 维护者的本机工作区使用仓库旁的独立游戏实例、`pbr-qa/` 离线检查目录、共享 Gradle 缓存，以及单独保存的参考文件。它们**不是仓库的一部分**，也不是其他合作者必须复制的目录结构。
+
+## Model branch layout
+
+Independent capture code lives in `src/main/java/dev/integratepbr/model/discovery`; its commands live in `model/client`. The single Python package is `engine/src/integratepbr_engine`; shared schemas and configuration live in `contracts` and `engine/configs`. See [README Model branch layout](README.md#model-branch-layout) for commands and fresh fixture checks.

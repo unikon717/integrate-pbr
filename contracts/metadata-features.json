@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "feature_count": 64,
+  "encoding": "float32, each value in [0,1], fixed order",
+  "groups": [
+    {"start": 0, "names": ["is_block", "is_item", "is_tool", "is_weapon", "is_armor", "is_door", "is_trapdoor", "is_log", "is_planks", "is_brick", "is_ore", "is_ingot", "is_container", "is_plant", "is_animated", "is_dyeable"]},
+    {"start": 16, "names": ["has_attack_damage", "has_durability", "has_armor_value", "has_harvest_level", "is_stackable", "is_emissive", "has_alpha", "has_external_pbr", "evidence_ingot", "evidence_ore", "evidence_nugget", "evidence_sapling", "evidence_log", "evidence_planks", "evidence_stone_tool", "evidence_recipe"]},
+    {"start": 32, "names": ["log_aspect_ratio", "texture_width_log2", "texture_height_log2", "alpha_coverage", "color_variance", "luminance_range", "edge_density", "horizontal_edge_ratio", "vertical_edge_ratio", "symmetry_horizontal", "symmetry_vertical", "connected_components_norm", "transparent_border_ratio", "frame_count_norm", "has_model_parent", "has_blockstate"]},
+    {"start": 48, "names": ["usage_gui", "usage_hand", "usage_world", "usage_armor", "usage_entity", "usage_particle", "usage_block_face", "usage_item_model", "renderer_vanilla", "renderer_custom", "uv_is_known", "uv_is_discontinuous", "tint_is_known", "source_is_mod", "shared_by_multiple_owners", "context_is_incomplete"]}
+  ],
+  "missing_value": 0,
+  "notes": ["Boolean features are exactly 0 or 1.", "Normalized measurements must use the preprocessing implementation version recorded in the model manifest.", "Zero means absent or unavailable; context_is_incomplete distinguishes missing context.", "Changing feature order or normalization requires a schema/model version change."]
+}

@@ -69,3 +69,12 @@ tasks.register('surfaceRegression', JavaExec) {
 }
 tasks.named('check') { dependsOn tasks.named('surfaceRegression') }
 tasks.named('test') { failOnNoDiscoveredTests = false }
+
+neoForge.addModdingDependenciesTo(sourceSets.test)
+tasks.register('resourceSnapshotRegression', JavaExec) {
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'dev.integratepbr.model.discovery.ResourceSnapshotRegression'
+    if (project.hasProperty('snapshotFixture')) args project.property('snapshotFixture')
+}
+tasks.named('check') { dependsOn tasks.named('resourceSnapshotRegression') }

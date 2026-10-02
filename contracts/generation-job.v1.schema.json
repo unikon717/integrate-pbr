@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://integratepbr.dev/contracts/generation-job.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocol_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "job_id": {
+      "$ref": "#/$defs/text"
+    },
+    "resource_snapshot_id": {
+      "$ref": "#/$defs/text"
+    },
+    "input": {
+      "$ref": "#/$defs/input"
+    },
+    "context": {
+      "$ref": "#/$defs/context"
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "model_package": {
+      "$ref": "#/$defs/model_package"
+    },
+    "output_dir": {
+      "$ref": "#/$defs/relative_path"
+    }
+  },
+  "required": [
+    "protocol_version",
+    "job_id",
+    "resource_snapshot_id",
+    "input",
+    "context",
+    "policy",
+    "model_package",
+    "output_dir"
+  ],
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[^/]+(?:/[^/]+)*$"
+    },
+    "resource_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "index",
+        "time"
+      ]
+    },
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frame_height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/frame"
+          },
+          "minItems": 1
+        },
+        "interpolate": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "frame_width",
+        "frame_height",
+        "frames",
+        "interpolate"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/text"
+        },
+        "source": {
+          "$ref": "#/$defs/text"
+        },
+        "value": {}
+      },
+      "required": [
+        "kind",
+        "source",
+        "value"
+      ]
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resource_id": {
+          "$ref": "#/$defs/resource_id"
+        },
+        "source_path": {
+          "$ref": "#/$defs/relative_path"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "alpha_mode": {
+          "enum": [
+            "opaque",
+            "cutout",
+            "translucent",
+            "unknown"
+          ]
+        },
+        "animation": {
+          "$ref": "#/$defs/animation"
+        }
+      },
+      "required": [
+        "resource_id",
+        "source_path",
+        "sha256",
+        "width",
+        "height"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "owners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resource_id"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "known_fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
+        },
+        "missing_fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "uniqueItems": true
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "owners",
+        "evidence",
+        "known_fields",
+        "missing_fields"
+      ]
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy_id": {
+          "$ref": "#/$defs/text"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "policy_id",
+        "version"
+      ]
+    },
+    "model_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "package_id": {
+          "$ref": "#/$defs/text"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        },
+        "architecture": {
+          "$ref": "#/$defs/text"
+        },
+        "preprocessing_version": {
+          "$ref": "#/$defs/text"
+        },
+        "weights_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "labels_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      },
+      "required": [
+        "package_id",
+        "version",
+        "architecture",
+        "preprocessing_version",
+        "weights_sha256",
+        "labels_sha256"
+      ]
+    }
+  }
+}

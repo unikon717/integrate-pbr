@@ -1,0 +1,24 @@
+schema_version: 1
+architecture: context_swin_unet_v1
+input:
+  channels: [srgb_red, srgb_green, srgb_blue, alpha, valid_surface]
+  metadata_features: 64
+  name_encoding: utf8_bytes
+  native_resolution: true
+encoder:
+  stem_channels: 48
+  stages:
+    - {channels: 48, stride: 1, window: 4, heads: 3, blocks: 2}
+    - {channels: 64, stride: 2, window: 4, heads: 4, blocks: 2}
+    - {channels: 128, stride: 2, window: 4, heads: 4, blocks: 2}
+    - {channels: 192, stride: 2, window: 4, heads: 6, blocks: 2}
+decoder:
+  upsample: nearest
+  skip_connections: true
+  context_film: true
+  convolutional_skip_paths: true
+heads: [object_type, object_materials, material, structure, boundary_xy, base_depth, fine_depth, smoothness, dielectric_f0, metal_type, ao]
+output:
+  spatial_resolution: input
+  deterministic_postprocess: true
+  suggested_pbr_upscale: 4

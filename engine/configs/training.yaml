@@ -1,0 +1,17 @@
+schema_version: 1
+seed: 20260930
+input_size_policy: native_with_batch_padding_to_multiple_of_8
+optimizer: adamw
+learning_rate: 0.0002
+weight_decay: 0.01
+warmup_fraction: 0.05
+effective_batch_size: 16
+early_stopping_metric: validation_total_loss
+split_group_keys: [mod_id, material_family, source_artwork_id, style_family, derivative_group]
+augmentations:
+  horizontal_flip: conditional_on_directional_labels
+  vertical_flip: conditional_on_directional_labels
+  rotation: multiples_of_90_only_and_reencode_vectors
+  color_jitter: weak_and_never_used_as_geometry_target
+  random_noise: disabled_for_height_supervision
+

@@ -17,3 +17,7 @@
 - 在资源包界面提供启用选择，并支持按物品或方块覆盖自动材质判断。
 
 目前的验证以构建、离线贴图检查和玩家的游戏截图反馈为主。生成质量仍在改进，不能保证每个模组或每种光影都得到相同效果。
+
+## Model branch isolation
+
+Preserve canonical legacy format22; isolate snapshot/runtime/atlas discovery and model commands. Maintain one experimental Python engine and unchanged contracts.

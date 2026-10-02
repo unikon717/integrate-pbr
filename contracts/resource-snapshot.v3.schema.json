@@ -1,0 +1,411 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 3
+    },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "selected_owner": {
+      "$ref": "#/$defs/owner"
+    },
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "const": "registry_json_candidates_v1"
+        },
+        "shared_scope_complete": {
+          "type": "boolean"
+        },
+        "owner_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "omissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/omission"
+          }
+        }
+      },
+      "required": [
+        "scope",
+        "shared_scope_complete",
+        "owner_count",
+        "omissions"
+      ]
+    },
+    "textures": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/texture"
+      }
+    },
+    "source_documents": {
+      "type": "array",
+      "maxItems": 8192,
+      "items": {
+        "$ref": "#/$defs/document"
+      }
+    },
+    "runtime_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "observation_schema_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "source_path": {
+          "const": "observations/runtime.json"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byte_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4194304
+        }
+      },
+      "required": [
+        "observation_schema_version",
+        "source_path",
+        "sha256",
+        "byte_count"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "selected_owner",
+    "discovery",
+    "textures",
+    "source_documents",
+    "runtime_observation"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://integratepbr.dev/contracts/resource-snapshot.v3.schema.json",
+  "$defs": {
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "item",
+            "block"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ]
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": "^(?!.*(?:\\\\|:))(?!/)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))[^/]+(?:/[^/]+)*$"
+        },
+        "source_pack_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byte_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4194304
+        }
+      },
+      "required": [
+        "resource_id",
+        "source_path",
+        "source_pack_id",
+        "sha256",
+        "byte_count"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "renderer": {
+          "const": "unknown"
+        },
+        "render_surface": {
+          "const": "unknown"
+        },
+        "topology": {
+          "const": "unknown"
+        },
+        "orientation": {
+          "const": "unknown"
+        },
+        "tint": {
+          "const": "unknown"
+        },
+        "missing_fields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "renderer",
+        "render_surface",
+        "topology",
+        "orientation",
+        "tint",
+        "missing_fields"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "model_texture_reference",
+            "armor_filename_candidate"
+          ]
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "resource_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+        }
+      },
+      "required": [
+        "kind",
+        "owner",
+        "resource_id"
+      ]
+    },
+    "omission": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/owner"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resource_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "owner",
+        "resource_id",
+        "detail"
+      ]
+    },
+    "texture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+:textures/[a-z0-9_./-]+\\.png$"
+        },
+        "owners": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/owner"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/asset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "width": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "height": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sidecar": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/asset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "companions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "normal": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/asset"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "specular": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/asset"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "normal",
+            "specular"
+          ]
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        }
+      },
+      "required": [
+        "resource_id",
+        "owners",
+        "evidence",
+        "source",
+        "width",
+        "height",
+        "sidecar",
+        "companions",
+        "context"
+      ]
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "resource_id",
+        "source_path",
+        "source_pack_id",
+        "sha256",
+        "byte_count"
+      ],
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": "^(?!.*(?:\\\\|:))(?!/)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))[^/]+(?:/[^/]+)*$"
+        },
+        "source_pack_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byte_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 262144
+        },
+        "kind": {
+          "enum": [
+            "model",
+            "blockstate"
+          ]
+        }
+      }
+    }
+  },
+  "description": "Transport shape only. Runtime validates canonical identity, roles, ordering, filesystem containment, hashes and decoded dimensions. Unknown facts never certify game use."
+}
